@@ -1,7 +1,9 @@
 const TelegramBot = require('node-telegram-bot-api');
+require('dotenv').config();
+const token = process.env.TOKEN; // ✅ đọc từ biến môi trường
 
 // === TOKEN BOT ===
-const token = '8151357346:AAFGs22kcLi-HcBzpp6rrdtC_VBj1et66Sk';
+
 
 // === TẠO BOT VỚI POLLING ===
 const bot = new TelegramBot(token, { polling: true });
