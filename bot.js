@@ -1,42 +1,28 @@
+const express = require('express');
 const TelegramBot = require('node-telegram-bot-api');
 require('dotenv').config();
-const token = process.env.TOKEN; // ✅ đọc từ biến môi trường
 
-// === TOKEN BOT ===
+const token = process.env.TOKEN;
+const url = process.env.URL; // URL của bạn trên Render, ví dụ https://your-app.onrender.com
+const port = process.env.PORT || 3000;
 
+const app = express();
+app.use(express.json());
 
-// === TẠO BOT VỚI POLLING ===
-const bot = new TelegramBot(token, { polling: true });
+const bot = new TelegramBot(token);
+bot.setWebHook(`${url}/bot${token}`);
 
-// === LOG KHI KHỞI ĐỘNG ===
-console.log("✅ Bot đã sẵn sàng và đang lắng nghe các tin nhắn...");
-
-// === KHI NGƯỜI DÙNG GÕ /start ===
-bot.onText(/\/start/, (msg) => {
-  const chatId = msg.chat.id;
-  const username = msg.from.username || msg.from.first_name || "Người dùng ẩn";
-  const userId = msg.from.id;
-
-  // === LINK WEBAPP KÈM THÔNG TIN NGƯỜI DÙNG ===
-  const webAppUrl = `https://frontend-chess-seven.vercel.app/?uid=${userId}&un=${username}`;
-
-  // === GỬI NÚT CHƠI GAME CHO NGƯỜI DÙNG ===
-  bot.sendMessage(chatId, "🎮 Bấm vào nút bên dưới để chơi cờ vua:", {
-    reply_markup: {
-      inline_keyboard: [[
-        {
-          text: "♟️ Vào chơi",
-          web_app: { url: webAppUrl }
-        }
-      ]]
-    }
-  });
-
-  // === LOG DEBUG ===
-  console.log(`📥 Bot đã nhận được tin nhắn từ người dùng: ${username} (ID: ${userId})`);
+app.post(`/bot${token}`, (req, res) => {
+  bot.processUpdate(req.body);
+  res.sendStatus(200);
 });
 
-// === LỖI POLLING ===
-bot.on("polling_error", (error) => {
-  console.error("❌ Lỗi khi polling:", error.code, error.message);
+bot.onText(/\/start/, (msg) => {
+  const chatId = msg.chat.id;
+  bot.sendMessage(chatId, 'Chào bạn! Bot đã sẵn sàng với webhook.');
+});
+
+app.listen(port, () => {
+  console.log(`Server đang chạy trên port ${port}`);
+  console.log(`Webhook URL: ${url}/bot${token}`);
 });
