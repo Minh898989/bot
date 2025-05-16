@@ -9,8 +9,10 @@ const port = process.env.PORT || 4000;
 const app = express();
 app.use(express.json());
 
-const bot = new TelegramBot(token, { webHook: { port: port } });
+// Tạo bot không dùng webHook port ở đây
+const bot = new TelegramBot(token);
 
+// Set webhook
 bot.setWebHook(`${url}/bot${token}`);
 
 app.post(`/bot${token}`, (req, res) => {
