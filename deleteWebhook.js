@@ -1,12 +1,18 @@
-const TelegramBot = require('node-telegram-bot-api');
+// deleteWebhook.js
+const fetch = require('node-fetch');
 require('dotenv').config();
 
 const token = process.env.TOKEN;
-const bot = new TelegramBot(token);
+const url = `https://api.telegram.org/bot${token}/deleteWebhook`;
 
-bot.deleteWebHook()
-  .then(() => {
-    console.log('✅ Webhook đã được xóa thành công');
+fetch(url, { method: 'POST' })
+  .then(res => res.json())
+  .then(json => {
+    if (json.ok) {
+      console.log('✅ Webhook đã được xóa thành công');
+    } else {
+      console.error('❌ Xóa webhook thất bại:', json);
+    }
     process.exit(0);
   })
   .catch(err => {
